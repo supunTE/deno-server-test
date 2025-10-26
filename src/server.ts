@@ -33,19 +33,38 @@ function handleRequest(req: Request): Response {
     });
   }
 
+  function cpuIntensiveWork(durationMs: number): void {
+    const startTime = Date.now();
+    let result = 0;
+
+    while (Date.now() - startTime < durationMs) {
+      // Perform calculations to consume CPU
+      for (let i = 0; i < 100000; i++) {
+        result += Math.sqrt(i) * Math.sin(i);
+      }
+    }
+  }
+
   // Routes
   //random number
   if (path === "/random" && req.method === "GET") {
     // Get delay from query param (in milliseconds)
     const delay = parseInt(url.searchParams.get("delay") || "0");
 
+    const cpuTime = parseInt(url.searchParams.get("cpu") || "0");
+
+    // Do CPU-intensive work
+    cpuIntensiveWork(cpuTime);
+
     return new Promise((resolve) => {
       setTimeout(() => {
+        const randomNum = Math.floor(Math.random() * 100) + 1;
         resolve(
-          new Response(JSON.stringify({ number: Math.random() }), { headers })
+          new Response(JSON.stringify({ randomNumber: randomNum }), {
+            headers,
+          }),
         );
       }, delay);
-    });
   }
 
   if (path === "/api/users" && req.method === "GET") {
