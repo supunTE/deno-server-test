@@ -48,23 +48,16 @@ function handleRequest(req: Request): Response {
   // Routes
   //random number
   if (path === "/random" && req.method === "GET") {
-    // Get delay from query param (in milliseconds)
-    const delay = parseInt(url.searchParams.get("delay") || "0");
-
     const cpuTime = parseInt(url.searchParams.get("cpu") || "0");
 
     // Do CPU-intensive work
     cpuIntensiveWork(cpuTime);
 
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const randomNum = Math.floor(Math.random() * 100) + 1;
-        resolve(
-          new Response(JSON.stringify({ randomNumber: randomNum }), {
-            headers,
-          }),
-        );
-      }, delay);
+    const randomNumber = Math.floor(Math.random() * 100) + 1;
+    return new Response(
+      JSON.stringify({ randomNumber, cpuTimeSpentMs: cpuTime }),
+      { headers }
+    );
   }
 
   if (path === "/api/users" && req.method === "GET") {
