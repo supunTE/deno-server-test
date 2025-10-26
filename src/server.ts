@@ -27,10 +27,35 @@ function handleRequest(req: Request): Response {
     return new Response(null, { status: 204, headers });
   }
 
-  // Routes
   if (path === "/" && req.method === "GET") {
     return new Response(JSON.stringify({ message: "Welcome to Deno API!" }), {
       headers,
+    });
+  }
+
+  // Routes
+  //random number
+  if (path === "/random" && req.method === "GET") {
+    // Get delay from query param (in milliseconds)
+    const delay = parseInt(url.searchParams.get("delay") || "0");
+
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(
+          new Response(JSON.stringify({ number: Math.random() }), { headers })
+        );
+      }, delay);
+    });
+  }
+
+  if (path === "/api/users" && req.method === "GET") {
+    // Get delay from query param (in milliseconds)
+    const delay = parseInt(url.searchParams.get("delay") || "0");
+
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(new Response(JSON.stringify(users), { headers }));
+      }, delay);
     });
   }
 
