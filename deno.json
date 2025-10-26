@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.ns", "deno.window"],
+    "strict": true
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "fmt": {
+    "options": {
+      "lineWidth": 80
+    }
+  },
+  "tasks": {
+    "start": "deno run --allow-net src/main.ts",
+    "test": "deno test --allow-read --allow-net tests/main_test.ts"
+  },
+  "imports": {
+    "@std/http": "jsr:@std/http@^1.0.21"
+  }
+}

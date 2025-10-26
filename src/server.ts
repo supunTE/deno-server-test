@@ -1,0 +1,81 @@
+// server.ts
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const users: User[] = [
+  { id: 1, name: "John Doe", email: "john@example.com" },
+  { id: 2, name: "Jane Smith", email: "jane@example.com" },
+];
+
+function handleRequest(req: Request): Response {
+  const url = new URL(req.url);
+  const path = url.pathname;
+
+  // CORS headers for React Native
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers });
+  }
+
+  // Routes
+  if (path === "/" && req.method === "GET") {
+    return new Response(JSON.stringify({ message: "Welcome to Deno API!" }), {
+      headers,
+    });
+  }
+
+  if (path === "/api/users" && req.method === "GET") {
+    return new Response(JSON.stringify(users), { headers });
+  }
+
+  if (path.startsWith("/api/users/") && req.method === "GET") {
+    const id = parseInt(path.split("/")[3]);
+    const user = users.find((u) => u.id === id);
+
+    if (user) {
+      return new Response(JSON.stringify(user), { headers });
+    }
+    return new Response(JSON.stringify({ error: "User not found" }), {
+      status: 404,
+      headers,
+    });
+  }
+
+  if (path === "/api/users" && req.method === "POST") {
+    return req.json().then((body) => {
+      const newUser: User = {
+        id: users.length + 1,
+        name: body.name,
+        email: body.email,
+      };
+      users.push(newUser);
+      return new Response(JSON.stringify(newUser), {
+        status: 201,
+        headers,
+      });
+    });
+  }
+
+  // 404
+  return new Response(JSON.stringify({ error: "Not found" }), {
+    status: 404,
+    headers,
+  });
+}
+
+export function startServer(port: number): Promise<void> {
+  return new Promise((resolve) => {
+    Deno.serve({ port }, handleRequest);
+    resolve();
+  });
+}
